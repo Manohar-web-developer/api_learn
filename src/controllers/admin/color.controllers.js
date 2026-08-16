@@ -4,30 +4,46 @@ const { generateUniqueSlug } = require("../../config/slugGenrate");
 const colorModel = require("../../modules/admin/color");
 var slugify = require('slugify');
 exports.create = async (request, response) => {
-    const dataSave = request.body;
-    let slug = slugify(dataSave.name, {
-        lower: true,
-        strict: true,
-    });
-    dataSave.slug = await generateUniqueSlug(colorModel, slug)
-    colorModel(dataSave).save()
-        .then((result) => {
-            const data = {
-                _status: true,
-                _message: "Data Create Succesfully",
-                _data: result,
-            }
-            response.send(data);
-        }).catch((error) => {
-            const data = {
-                _status: false,
-                _message: "Something went wrong",
-                _error: error,
-                _data: '',
-            }
-            response.send(data);
-        })
-}
+    try {
+
+        const dataSave = request.body;
+
+        console.log(request.body);
+        console.log(request.file);
+
+        if (request.file) {
+            dataSave.image = request.file.filename;
+        }
+
+        let slug = slugify(dataSave.name, {
+            lower: true,
+            strict: true,
+        });
+
+        dataSave.slug = await generateUniqueSlug(
+            colorModel,
+            slug
+        );
+
+        const result = await colorModel.create(dataSave);
+
+        response.send({
+            _status: true,
+            _message: "Data Created Successfully",
+            _data: result,
+        });
+
+    } catch (error) {
+
+        response.send({
+            _status: false,
+            _message: "Something went wrong",
+            _error: error,
+            _data: '',
+        });
+
+    }
+};
 exports.view = async (request, response) => {
     const andCondition = [{
         delete_at: null,

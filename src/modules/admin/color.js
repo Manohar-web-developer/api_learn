@@ -15,7 +15,6 @@ const colorSchema = new mongoose.Schema({
                 if(currenId){
                     query._id = {$ne: currenId};
                 }
-                console.log(query)
 
                 const existing = await colorModel.findOne(query);
 
@@ -36,7 +35,10 @@ const colorSchema = new mongoose.Schema({
         required: [true, 'Code is required'],
         
     },
-    
+    image : {
+        type: String,
+        required: [true, 'Image Is Required']
+    },
     status: {
         type: Boolean,
         default: true
